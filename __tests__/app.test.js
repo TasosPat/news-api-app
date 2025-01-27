@@ -1,3 +1,7 @@
+const request = require("supertest");
+const app = require("../app.js");
+const db = require("../db/connection");
+
 const endpointsJson = require("../endpoints.json");
 /* Set up your test imports here */
 
@@ -8,8 +12,8 @@ describe("GET /api", () => {
     return request(app)
       .get("/api")
       .expect(200)
-      .then(({ body: { endpoints } }) => {
-        expect(endpoints).toEqual(endpointsJson);
+      .then((res) => {
+        expect(res.body).toEqual(endpointsJson);
       });
   });
 });
