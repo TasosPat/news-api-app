@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require('../db/seeds/seed');
 const endpointsJson = require("../endpoints.json");
 const {articleData, commentData, topicData, userData} = require("../db/data/test-data/index.js");
+const {convertTimestampToDate, createRef, formatComments} = require("../db/seeds/utils.js");
 
 beforeEach(() => seed({ topicData, userData, articleData, commentData }));
 afterAll(() => db.end());
@@ -34,6 +35,8 @@ describe("GET /api/topics", () => {
 
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with a single article", () => {
+    const dateObj = convertTimestampToDate({created_at: 1594329060000});
+    const date = dateObj.created_at;
     return request(app)
       .get("/api/articles/1")
       .expect(200)
@@ -43,7 +46,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(article.topic).toBe('mitch');
         expect(article.author).toBe("butter_bridge");
         expect(article.body).toBe("I find this existence challenging");
-        // expect(article.created_at).toBe(1594329060000);
+        expect(typeof article.created_at).toBe("string");
         expect(article.votes).toBe(100);
         expect(article.article_img_url).toBe("https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700");
       });
@@ -53,7 +56,7 @@ describe("GET /api/articles/:article_id", () => {
       .get('/api/articles/999')
       .expect(404)
       .then((response) => {
-        expect(response.body.msg).toBe('Article does not exist');
+        expect(response.body.msg).toBe('No article found for article_id: 999');
       });
   });
   test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
