@@ -35,8 +35,6 @@ describe("GET /api/topics", () => {
 
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with a single article", () => {
-    const dateObj = convertTimestampToDate({created_at: 1594329060000});
-    const date = dateObj.created_at;
     return request(app)
       .get("/api/articles/1")
       .expect(200)
@@ -66,5 +64,31 @@ describe("GET /api/articles/:article_id", () => {
       .then((response) => {
         expect(response.body.msg).toBe('Bad Request');
       });
+  });
+});
+
+describe("GET /api/articles",() => {
+  test("200: Responds with all articles with the comment count property added and sorted by date in descending order", () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({body}) => {
+      console.log(body.articles);
+      expect(body.articles).toBeInstanceOf(Array);
+      expect(body.articles.length).toBeGreaterThan(0);
+      body.articles.forEach((article) => {
+        expect(article).toMatchObject({
+          article_id: expect.any(Number),
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+          comment_count: expect.any(Number),
+        });
+        expect(article).not.toHaveProperty("body");
+      });
+    })
   });
 });
