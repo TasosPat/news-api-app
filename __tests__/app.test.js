@@ -59,7 +59,7 @@ describe("GET /api/articles/:article_id", () => {
   });
   test('GET:400 sends an appropriate status and error message when given an invalid id', () => {
     return request(app)
-      .get('/api/articles/not-a-team')
+      .get('/api/articles/not-an-article')
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe('Bad Request');
@@ -73,7 +73,6 @@ describe("GET /api/articles",() => {
     .get('/api/articles')
     .expect(200)
     .then(({body}) => {
-      console.log(body.articles);
       expect(body.articles).toBeInstanceOf(Array);
       expect(body.articles.length).toBeGreaterThan(0);
       body.articles.forEach((article) => {
@@ -100,6 +99,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(200)
       .then((response) => {
         const comments = response.body.comments;
+        expect
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
@@ -107,7 +107,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             created_at: expect.any(String),
             author: expect.any(String),
             body: expect.any(String),
-            article_id: expect.any(Number)
+            article_id: 1
           });
         })
       });
@@ -138,3 +138,64 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
+        username: "lurker",
+        body: "Jaki fajny bober"
+      })
+      .expect(201)
+      .then((res) => {
+        expect(res.body.comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: "Jaki fajny bober",
+          votes: 0,
+          author: "lurker",
+          article_id: 4,
+          created_at: expect.any(String)
+        });
+      });
+  });
+  test("POST 400: Responds with an appropriate status and error message when provided with a bad topic (no body)", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
+        username: "lurker"
+      })
+      .expect(400)
+      .then((res) => {
+        expect(res.body.msg).toBe("Bad Request");
+      });
+  });
+  test("POST 404: Responds with an appropriate status and error message when provided with a bad topic (no username)", () => {
+    return request(app)
+      .post("/api/articles/4/comments")
+      .send({
+        username: "Tasos",
+        body: "jaki fajny bober"
+      })
+      .expect(404)
+      .then((res) => {
+        expect(res.body.msg).toBe("User doesn't exist");
+      });
+  });
+  test('POST:404 sends an appropriate status and error message when given a valid but non-existent id', () => {
+    return request(app)
+      .get('/api/articles/999/comments')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('No article found for article_id: 999');
+      });
+  });
+  test('POST:400 sends an appropriate status and error message when given an invalid id', () => {
+    return request(app)
+      .get('/api/articles/not-an-article/comments')
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe('Bad Request');
+      });
+  });
+  })
