@@ -18,7 +18,11 @@ function getCommentsByArticleID(req, res, next) {
 function addCommentToArticle(req, res, next) {
     const newComment = req.body;
     const {article_id} = req.params;
-    insertCommentToArticle(newComment, article_id).then((comment) => {
+    fetchArticlebyID(article_id)
+    .then(() => {
+        return insertCommentToArticle(newComment, article_id)
+    })
+    .then((comment) => {
         res.status(201).send({comment});
     })
     .catch((err) => {

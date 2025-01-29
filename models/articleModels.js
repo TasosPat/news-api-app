@@ -30,4 +30,13 @@ function fetchArticles() {
   })
 }
 
-module.exports = {fetchArticlebyID, fetchArticles};
+function insertVotes({inc_votes}, article_id) {
+  return db
+  .query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`, [inc_votes, article_id])
+  .then((article) => {
+    console.log(article.rows[0]);
+    return article.rows[0];
+  })
+}
+
+module.exports = {fetchArticlebyID, fetchArticles, insertVotes};
