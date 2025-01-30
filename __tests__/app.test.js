@@ -237,7 +237,7 @@ describe("POST /api/articles/:article_id/comments", () => {
     });
   })
 
-  describe.only("/api/comments/:comment_id", () => {
+  describe("/api/comments/:comment_id", () => {
     test("DELETE: 204 return no content", () => {
       return request(app)
       .delete("/api/comments/1")
@@ -263,4 +263,22 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
     });
   })
-  //random comment because I forgot to create a new branch
+  
+  describe("GET /api/users",() => {
+    test("200: Responds with all users", () => {
+      return request(app)
+      .get('/api/users')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.users).toBeInstanceOf(Array);
+        expect(body.users.length).toBeGreaterThan(0);
+        body.users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      })
+    });
+  });
