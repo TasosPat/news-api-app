@@ -3,7 +3,7 @@ const app = express();
 const getDoc = require("./controllers/getDoc.js");
 const {getTopics} = require("./controllers/topicControllers.js");
 const { getArticlebyID, getArticles, updateVotes } = require('./controllers/articleControllers.js');
-const { getCommentsByArticleID, addCommentToArticle } = require('./controllers/commentControllers.js');
+const { getCommentsByArticleID, addCommentToArticle, deleteCommentByID } = require('./controllers/commentControllers.js');
 
 app.use(express.json());
 
@@ -20,6 +20,8 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleID);
 app.post('/api/articles/:article_id/comments', addCommentToArticle);
 
 app.patch('/api/articles/:article_id', updateVotes);
+
+app.delete('/api/comments/:comment_id', deleteCommentByID);
 
 app.use((err, req, res, next) => {
     if(err.code === "22P02" || err.code === "23502") {
