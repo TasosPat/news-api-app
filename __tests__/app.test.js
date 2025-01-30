@@ -306,4 +306,13 @@ describe("POST /api/articles/:article_id/comments", () => {
         });
       })
     });
+    test("400: returns an error 400 when trying to sort by an unavailable or non existent category", () => {
+      return request(app)
+      .get('/api/articles?sort_by=body&order=asc')
+      .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe('Cannot be sorted based on this criteria');
+        });
+    })
   });
+  //sorry about my previous pull request. It was wrong.
