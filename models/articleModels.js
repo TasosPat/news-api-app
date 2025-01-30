@@ -14,7 +14,15 @@ function fetchArticlebyID(article_id) {
     });
 }
 
-function fetchArticles() {
+function fetchArticles(sort_by = "created_at", order = "desc") {
+  const allowedSortBy = ["title", "topic", "author", "created_at", "votes"];
+  const allowedOrder = ["desc", "asc"];
+  if(!allowedSortBy.includes(sort_by) || !allowedOrder.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      msg: 'Cannot be sorted based on this criteria'
+    });
+  }
   return db.query(`
     SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, article_img_url,
     COUNT(comments.comment_id)
@@ -23,7 +31,7 @@ function fetchArticles() {
     LEFT JOIN comments
     ON comments.article_id = articles.article_id
     GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC;
+    ORDER BY articles.${sort_by} ${order.toUpperCase()};
     `)
   .then((result) => {
     return result.rows;
@@ -34,7 +42,6 @@ function insertVotes({inc_votes}, article_id) {
   return db
   .query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`, [inc_votes, article_id])
   .then((article) => {
-    console.log(article.rows[0]);
     return article.rows[0];
   })
 }

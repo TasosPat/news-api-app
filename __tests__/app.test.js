@@ -282,3 +282,28 @@ describe("POST /api/articles/:article_id/comments", () => {
       })
     });
   });
+
+  describe("GET /api/articles",() => {
+    test("200: Responds with all articles with the comment count property added and sorted by date in descending order", () => {
+      return request(app)
+      .get('/api/articles?sort_by=author&order=asc')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles.length).toBeGreaterThan(0);
+        body.articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          expect(article).not.toHaveProperty("body");
+        });
+      })
+    });
+  });
