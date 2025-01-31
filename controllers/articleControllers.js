@@ -54,7 +54,7 @@ function updateVotes(req, res, next) {
   const {article_id} = req.params;
   fetchArticlebyID(article_id)
   .then(() => {
-    return insertVotes(newVotes ,article_id)
+    return insertVotes(newVotes, article_id)
   })
   .then((article) => {
     res.status(200).send({ article })
