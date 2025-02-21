@@ -326,44 +326,24 @@ describe("POST /api/articles/:article_id/comments", () => {
     })
   });
 
-  describe("GET /api/articles topic query",() => {
-    test("200: Responds with all articles with the comment count property added and sorted by date in descending order", () => {
+  describe.only("GET /api/users/:username Get a username",() => {
+    test("200: returns a single user", () => {
       return request(app)
-      .get('/api/articles?topic=cats')
+      .get("/api/users/butter_bridge")
       .expect(200)
-      .then(({body}) => {
-        expect(body.articles).toBeInstanceOf(Array);
-        expect(body.articles.length).toBeGreaterThan(0);
-        body.articles.forEach((article) => {
-          expect(article).toMatchObject({
-            article_id: expect.any(Number),
-            title: expect.any(String),
-            topic: "cats",
-            author: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
-            comment_count: expect.any(Number),
-          });
-          expect(article).not.toHaveProperty("body");
+      .then((response) => {
+        const user = response.body.user;
+        expect(user.username).toBe("butter_bridge");
+        expect(user.name).toBe('jonny');
+        expect(user.avatar_url).toBe("https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg");
+      });
+    })
+    test('GET:404 sends an appropriate status and error message when given an invalid username', () => {
+      return request(app)
+        .get('/api/users/not-a-user')
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe("Username not-a-user doesn't exist");
         });
-      })
     });
-    test("400: returns an error 400 when trying to get articles with a non existent topic", () => {
-      return request(app)
-      .get('/api/articles?topic=hello')
-      .expect(400)
-        .then((response) => {
-          expect(response.body.msg).toBe("Topic doesn't exist");
-        });
-    })
-    test("404: returns an error 404 when there are no articles for the given topic", () => {
-      return request(app)
-      .get('/api/articles?topic=paper')
-      .expect(404)
-        .then((response) => {
-          expect(response.body.msg).toBe("No article found with topic: paper");
-        });
-    })
   })
-  //forgot to make a branch again :)
