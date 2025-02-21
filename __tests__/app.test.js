@@ -326,7 +326,7 @@ describe("POST /api/articles/:article_id/comments", () => {
     })
   });
 
-  describe.only("GET /api/users/:username Get a username",() => {
+  describe("GET /api/users/:username Get a username",() => {
     test("200: returns a single user", () => {
       return request(app)
       .get("/api/users/butter_bridge")
